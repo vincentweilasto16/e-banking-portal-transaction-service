@@ -23,22 +23,13 @@ public class TransactionConsumer {
    String transactionJson = record.value();
    TransactionEntity transactionEntity = objectMapper.readValue(transactionJson, TransactionEntity.class);
 
-   // Extract userId from transaction - you may need to add userId to TransactionModel or parse it here
-   String userId = extractUserId(transactionEntity); // implement this method based on your data
-
    transactionRepository.save(transactionEntity);
 
    // Optionally log consumed transaction
-   System.out.println("Consumed transaction: " + transactionEntity.getId() + " for user " + userId);
+   System.out.println("Consumed transaction: " + transactionEntity.getId() + " for user " + transactionEntity.getUserId());
 
   } catch (Exception e) {
    e.printStackTrace();
   }
- }
-
- private String extractUserId(TransactionEntity transactionEntity) {
-  // TODO: Implement logic to get userId from transaction data or its metadata
-  // For now, just return a dummy userId for demo
-  return "P-0123456789";
  }
 }
