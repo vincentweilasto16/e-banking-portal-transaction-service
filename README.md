@@ -209,4 +209,33 @@ Transactions are consumed from a Kafka topic and stored in a PostgreSQL database
 - Maven for build management
 
 
+## Scope / Limitations
+
+The current implementation of the e-Banking Transaction Service has some limitations and areas for future enhancement:
+
+1. **Logging and Monitoring**  
+   - Basic logging is implemented, but monitoring can be enhanced.  
+   - Integration with tools like **Prometheus** and **Grafana** is not implemented yet.
+
+2. **Exchange Rate Service**  
+   - The exchange rate service is not implemented.  
+   - As a result, the **total debit and credit values** returned by the API are always `0`.
+
+3. **Unit and Integration Tests**  
+   - Basic unit tests are included.  
+   - Test coverage is **not comprehensive** and may not cover all project features and edge cases.
+
+4. **Docker & Kubernetes / OpenShift Deployment**  
+   - Building a Docker image and Kubernetes/OpenShift deployment configuration is **not included** in this repository.
+
+5. **Continuous Integration (CI)**  
+   - Integration with services like **CircleCI** or GitHub Actions is **not configured**.  
+   - There is no automated pipeline to run unit or integration tests on commits.
+
+---
+
+**Note:** These limitations highlight areas that could be improved in future iterations.
+
+
+
 
