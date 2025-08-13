@@ -238,12 +238,11 @@ The current implementation of the e-Banking Transaction Service has some limitat
    - Basic unit tests are included.  
    - Test coverage is **not comprehensive** and may not cover all project features and edge cases.
 
-4. **Kubernetes / OpenShift Deployment**  
-   - Building Kubernetes/OpenShift deployment configuration is **not included** in this repository.
+4. **Refactoring and Code Structure**
+   - The code can be further refactored to improve readability, maintainability, and modularity.
+   - Some parts of the code could be better structured, e.g., separating service logic, controller logic, and repository layers more clearly.
+   - Applying consistent naming conventions and removing redundant code would enhance overall code quality.
 
-5. **Continuous Integration (CI)**  
-   - Integration with services like **CircleCI** or GitHub Actions is **not configured**.  
-   - There is no automated pipeline to run unit or integration tests on commits.
 
 ---
 
