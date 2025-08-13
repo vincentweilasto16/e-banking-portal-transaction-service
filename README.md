@@ -71,26 +71,36 @@ Transactions are consumed from a Kafka topic and stored in a PostgreSQL database
      - userId (optional if token contains it)
      - month, year
      - page, size for pagination.
-  - Response will return paginated transactions for the logged-in user with total credits and debits.
+   - Response will return paginated transactions for the logged-in user with total credits and debits.
 
 
 
 ## API Endpoints
 
 - Generate JWT Token (this api created for easily generate the bearer token for spesific user id)
-  *POST /api/v1/auth/generate-token?userId={userId}*
+
+  Endpoint:
+   ```bash
+  POST /api/v1/auth/generate-token?userId={userId}*
+   ```
 
   Query Parameter:
   - userId (string, required)
 
   Response Example:
+  ```bash
   {
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
   }
+  ```
 
 
 - Get Transactions By User ID
-  *POST /api/v1/transactions?userId={userId}*
+
+  Endpoint:
+  ```bash
+  POST /api/v1/transactions?userId={userId}
+  ```
 
   Headers:
   Authorization: Bearer <token>
@@ -102,6 +112,7 @@ Transactions are consumed from a Kafka topic and stored in a PostgreSQL database
   - size (integer, optional)
 
   Response Example:
+  ```bash
   {
     "data": {
       "transactions": [
@@ -127,6 +138,7 @@ Transactions are consumed from a Kafka topic and stored in a PostgreSQL database
     "total_elements": 1,
     "total_pages": 0
   }
+  ```
 
 
 
