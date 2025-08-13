@@ -81,7 +81,7 @@ Transactions are consumed from a Kafka topic and stored in a PostgreSQL database
 
   Endpoint:
    ```bash
-  POST /api/v1/auth/generate-token?userId={userId}*
+  POST /api/v1/auth/generate-token?userId={userId}
    ```
 
   Query Parameter:
@@ -143,24 +143,41 @@ Transactions are consumed from a Kafka topic and stored in a PostgreSQL database
 
 
 ## How To Run The Application
-   1. Start Docker Containers
-      ```bash
-      docker-compose up -d
-      ```
-
-      - Ensure Kafka and Zookeper are running
-      - Create kafka topic 'transactions'
+   1. Start All Services Using Docker Compose
+      - All required services (Spring Boot app, PostgreSQL, Kafka, Zookeeper) are defined in docker-compose.yml. Start them with:
         ```bash
-        docker exec -it kafka kafka-topics --create --topic transactions --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+        docker-compose up --build -d
+        ```
+      
+        This will create and start containers for:
+        - zookeeper
+        - kafka
+        - postgres
+        - transaction-service (Spring Boot application)
+
+      - Ensure all service running by:
+        ```bash
+        docker ps
         ```
 
-  2. Start PostgreSQL
-     Before running the Spring Boot application, make sure PostgreSQL is running. You can start it **using Docker** or run       it **locally**.
+  2. Create kafka topic 'transactions'
+     Once Kafka is running, create the **transactions** topic:
+        ```bash
+        docker exec -it kafka kafka-topics --create --topic transactions --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1
+        ```
+     **Note:** Use kafka:9092 (container name) as the bootstrap server inside Docker network.
 
-      Example using Docker:
-      ```bash
-      docker run --name postgres-db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=e_banking_db -p 5432:5432 -d postgres:15
-      ```
+  3. Check PostgreSQL
+     PostgreSQL is running inside Docker with the database e_banking_db and credentials defined in docker-compose.yml:
+     - Database: e_banking_db
+     - Username: postgres
+     - Password: postgres
+     - Port: 5432
+     
+     Access the database using DBeaver or Docker CLI:
+     ```bash
+     docker exec -it <postgres_container_name> psql -U postgres -d e_banking_db
+     ```
 
       Database configuration can be found in application.properties:
       ```bash
@@ -170,18 +187,11 @@ Transactions are consumed from a Kafka topic and stored in a PostgreSQL database
       spring.jpa.hibernate.ddl-auto=update
       spring.jpa.show-sql=true
       ```
-      
- 3. Run Spring Boot Application
-    ```bash
-    mvn spring-boot:run
-    ```
 
- 4. Produce Transaction Messages
-    Use Kafka client or Docker container to produce JSON messages to transactions topic.
-
-    Example on docker container:
+ 4. Produce Transaction Messages To Kafka
+    Use Kafka console producer inside Docker:
     ```bash
-    docker exec -it kafka kafka-console-producer --topic transactions --bootstrap-server localhost:9092
+    docker exec -it kafka kafka-console-producer --topic transactions --bootstrap-server kafka:9092
     ```
 
     Then input the message and press enter, example:
@@ -190,11 +200,14 @@ Transactions are consumed from a Kafka topic and stored in a PostgreSQL database
      ```
 
  5. Generate JWT Token
-    Hit Swagger endpoint /api/v1/auth/generate-token?userId=P-0123456789 to get JWT token.
+    Hit Swagger endpoint to generate a token:
+    ```bash
+    /api/v1/auth/generate-token?userId=P-0123456789
+    ```
 
- 6. Fetch Transactions
-    - Use Swagger /api/v1/transactions with Bearer token.
-    - Set query params for month, year, page, size.
+ 7. Fetch Transactions
+    Use Swagger /api/v1/transactions with Bearer token.
+    - Set query parameters: month, year, page, size.
     - Response returns paginated transactions for the logged-in user.
      
 
@@ -225,8 +238,8 @@ The current implementation of the e-Banking Transaction Service has some limitat
    - Basic unit tests are included.  
    - Test coverage is **not comprehensive** and may not cover all project features and edge cases.
 
-4. **Docker & Kubernetes / OpenShift Deployment**  
-   - Building a Docker image and Kubernetes/OpenShift deployment configuration is **not included** in this repository.
+4. **Kubernetes / OpenShift Deployment**  
+   - Building Kubernetes/OpenShift deployment configuration is **not included** in this repository.
 
 5. **Continuous Integration (CI)**  
    - Integration with services like **CircleCI** or GitHub Actions is **not configured**.  
