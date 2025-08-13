@@ -4,7 +4,6 @@ This is a **Spring Boot microservice** for handling e-Banking transactions.
 It provides a REST API for returning **paginated transaction lists** for a given user, with total credit and debit values calculated per page.  
 Transactions are consumed from a Kafka topic and stored in a PostgreSQL database.
 
----
 
 ## Assumptions
 
@@ -25,9 +24,9 @@ Transactions are consumed from a Kafka topic and stored in a PostgreSQL database
 | user_id    | string  | Owner user ID               |
 | value_date | date    | Transaction date            |
 
----
 
 ## Architecture Diagram
+```
 +----------------+          +------------------+          +-----------------+
 |  API Client    |  JWT     |  Spring Boot     | Kafka    |  PostgreSQL     |
 | (Swagger/Postman) |------>|  Transaction API |<-------->|  transactions  |
@@ -43,9 +42,8 @@ Transactions are consumed from a Kafka topic and stored in a PostgreSQL database
                              +----------------+
                              | Exchange Rates |
                              +----------------+
+```
 
-
----
 
 ## Process Flow:
 1. Kafka Topic Setup
@@ -76,7 +74,6 @@ Transactions are consumed from a Kafka topic and stored in a PostgreSQL database
   - Response will return paginated transactions for the logged-in user with total credits and debits.
 
 
----
 
 ## API Endpoints
 
@@ -132,13 +129,63 @@ Transactions are consumed from a Kafka topic and stored in a PostgreSQL database
   }
 
 
----
 
 ## How To Run The Application
+   1. Start Docker Containers
+      ```bash
+      docker-compose up -d
+      ```
 
+      - Ensure Kafka and Zookeper are running
+      - Create kafka topic 'transactions'
+        ```bash
+        docker exec -it kafka kafka-topics --create --topic transactions --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+        ```
 
+  2. Start PostgreSQL
+     Before running the Spring Boot application, make sure PostgreSQL is running. You can start it **using Docker** or run       it **locally**.
 
----
+      Example using Docker:
+      ```bash
+      docker run --name postgres-db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=e_banking_db -p 5432:5432 -d postgres:15
+      ```
+
+      Database configuration can be found in application.properties:
+      ```bash
+      spring.datasource.url=jdbc:postgresql://localhost:5432/e_banking_db
+      spring.datasource.username=postgres
+      spring.datasource.password=postgres
+      spring.jpa.hibernate.ddl-auto=update
+      spring.jpa.show-sql=true
+      ```
+      
+ 3. Run Spring Boot Application
+    ```bash
+    mvn spring-boot:run
+    ```
+
+ 4. Produce Transaction Messages
+    Use Kafka client or Docker container to produce JSON messages to transactions topic.
+
+    Example on docker container:
+    ```bash
+    docker exec -it kafka kafka-console-producer --topic transactions --bootstrap-server localhost:9092
+    ```
+
+    Then input the message and press enter, example:
+    ```bash
+    {"id":"123e4567-e89b-12d3-a456-426614174000","amount":100.00,"currency":"GBP","iban":"GB00TEST1234567890","valueDate":"2023-08-01","description":"Salary payment","user_id":"P-0123456789"}
+     ```
+
+ 5. Generate JWT Token
+    Hit Swagger endpoint /api/v1/auth/generate-token?userId=P-0123456789 to get JWT token.
+
+ 6. Fetch Transactions
+    - Use Swagger /api/v1/transactions with Bearer token.
+    - Set query params for month, year, page, size.
+    - Response returns paginated transactions for the logged-in user.
+     
+
 
 ## Technology Used
 - Java 17 + Spring Boot
